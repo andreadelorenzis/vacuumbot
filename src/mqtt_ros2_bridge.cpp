@@ -7,6 +7,7 @@
 #include "vacuum_bot/msg/coverage_zone.hpp"
 #include "vacuum_bot/msg/coverage_plan.hpp"
 #include "vacuum_bot/msg/coverage_mission.hpp"
+#include "nav_msgs/msg/occupancy_grid.hpp"
 
 using json = nlohmann::json;
 
@@ -57,6 +58,13 @@ public:
             "/cleaning_mission", 
             10);
         RCLCPP_INFO(this->get_logger(), "Publisher on /cleaning_mission created");
+
+        map_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>(
+            "/map",
+            10,
+            std::bind(&MqttRos2Bridge::map_callback, this, std::placeholders::_1)
+        );
+        RCLCPP_INFO(this->get_logger(), "Subscribed to topic /map");
 
         debug_pub_ = this->create_publisher<std_msgs::msg::String>("/debug", 10);
         publishDebug("MqttRos2Bridge initialized");
@@ -166,6 +174,35 @@ public:
 
     void delivery_complete(mqtt::delivery_token_ptr) {}
 
+    void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
+        try {
+            publishDebug("Message received on topic /map");
+
+            json j;
+            j["header"]["stamp"] = msg->header.stamp.sec;
+            j["header"]["frame_id"] = msg->header.frame_id;
+            j["info"]["resolution"] = msg->info.resolution;
+            j["info"]["width"] = msg->info.width;
+            j["info"]["height"] = msg->info.height;
+            j["info"]["origin"]["position"]["x"] = msg->info.origin.position.x;
+            j["info"]["origin"]["position"]["y"] = msg->info.origin.position.y;
+            j["info"]["origin"]["position"]["z"] = msg->info.origin.position.z;
+            j["info"]["origin"]["orientation"]["x"] = msg->info.origin.orientation.x;
+            j["info"]["origin"]["orientation"]["y"] = msg->info.origin.orientation.y;
+            j["info"]["origin"]["orientation"]["z"] = msg->info.origin.orientation.z;
+            j["info"]["origin"]["orientation"]["w"] = msg->info.origin.orientation.w;
+    
+            j["data"] = msg->data;
+    
+            std::string payload = j.dump();
+            mqtt_client_.publish(MQTT_PUB_TOPIC, payload.c_str(), payload.size());
+            RCLCPP_INFO(this->get_logger(), "Mappa pubblicata su MQTT con %dx%d celle",
+                        msg->info.width, msg->info.height);
+        } catch (const std::exception &e) {
+            RCLCPP_ERROR(this->get_logger(), "Errore nella serializzazione della mappa: %s", e.what());
+        }
+    }
+
 private:
     void publishDebug(const std::string & msg, const std::string & caller = "MqttRos2Bridge") {
         std_msgs::msg::String debug_msg;
@@ -178,6 +215,7 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::Polygon>::SharedPtr coverage_pub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr manual_pub_;
     rclcpp::Publisher<vacuum_bot::msg::CoverageMission>::SharedPtr mission_pub_;
+    rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr debug_pub_;
     mqtt::async_client mqtt_client_;
 };

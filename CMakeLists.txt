@@ -23,6 +23,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 if(NOT BUILD_FOR_ROBOT)
   find_package(nav2_msgs REQUIRED)
   find_package(nav2_core REQUIRED)
@@ -48,7 +49,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CoverageZone.msg"
   "msg/CoveragePlan.msg"
   "msg/CoverageMission.msg"
-  DEPENDENCIES geometry_msgs
+  DEPENDENCIES geometry_msgs nav_msgs
  )
 ament_export_dependencies(rosidl_default_runtime)
 
@@ -96,6 +97,7 @@ if(NOT BUILD_FOR_ROBOT)
   ament_target_dependencies(sim_step_controller_node
     rclcpp
     geometry_msgs
+    nav_msgs
     nav2_core
     pluginlib
   )
@@ -103,12 +105,14 @@ if(NOT BUILD_FOR_ROBOT)
   ament_target_dependencies(web_bridge_node
     rclcpp
     geometry_msgs
+    nav_msgs
   )
 
   ament_target_dependencies(coverage_nav2_node
     rclcpp
     rclcpp_action
     geometry_msgs
+    nav_msgs
     nav2_core
     pluginlib
     Fields2Cover
@@ -121,6 +125,7 @@ ament_target_dependencies(mqtt_ros2_bridge
   rclcpp
   std_msgs
   geometry_msgs
+  nav_msgs
 )
 
 ament_target_dependencies(debug_node rclcpp 
@@ -142,6 +147,7 @@ if(BUILD_FOR_ROBOT)
   ament_target_dependencies(real_step_controller_node
     rclcpp
     geometry_msgs
+    nav_msgs
   )
 
 endif()
