@@ -78,7 +78,7 @@ public:
 
         odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-        last_odom_time_ = this->now();
+        last_odom_time_ = this->now();y
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
@@ -127,6 +127,11 @@ public:
         else if (cmd == "RIGHT") current_state = RobotState::RIGHT;
         else if (cmd == "FORWARD") current_state = RobotState::FORWARD;
         else if (cmd == "STOP")  current_state = RobotState::STOP;
+
+        // Set last time two seconds in the future so that the watchdog is
+        // not immediately triggered
+        auto now_time = now();              
+        last_cmd_time_ = now_time + std::chrono::seconds(2); 
     }
 
 
