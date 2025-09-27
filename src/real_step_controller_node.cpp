@@ -21,6 +21,11 @@
 #include "std_msgs/msg/string.hpp"
 #include <pigpiod_if2.h>
 
+#include <nav_msgs/msg/odometry.hpp>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+
 struct IRSignal {
     std::string type; // "pulse" o "space"
     int duration;     // microsecondi
@@ -140,7 +145,66 @@ public:
             break;
         }
         send_raw_wave(pi, signal, IR_TX_PIN, CARRIER_FREQ, DUTY_CYCLE);
+        publish_odom();
     }
+
+    void publish_odom() 
+    {
+        // Delta t
+        auto now_time = this->now();
+        double dt = (now_time - last_odom_time_).seconds();
+        last_odom_time_ = now_time;
+
+        // Current velocity
+        double linear = command_map.at(current_state).first;
+        double angular = command_map.at(current_state).second;
+
+        // Pose integration
+        double delta_x = linear * cos(theta_) * dt;
+        double delta_y = linear * sin(theta_) * dt;
+        double delta_theta = angular * dt;
+
+        x_ += delta_x;
+        y_ += delta_y;
+        theta_ += delta_theta;
+
+        // Publish odometry message
+        auto odom_msg = nav_msgs::msg::Odometry();
+        odom_msg.header.stamp = now_time;
+        odom_msg.header.frame_id = "odom";
+        odom_msg.child_frame_id = "base_link";
+        odom_msg.pose.pose.position.x = x_;
+        odom_msg.pose.pose.position.y = y_;
+        odom_msg.pose.pose.position.z = 0.0;
+
+        tf2::Quaternion q;
+        q.setRPY(0, 0, theta_);
+        odom_msg.pose.pose.orientation.x = q.x();
+        odom_msg.pose.pose.orientation.y = q.y();
+        odom_msg.pose.pose.orientation.z = q.z();
+        odom_msg.pose.pose.orientation.w = q.w();
+
+        odom_msg.twist.twist.linear.x = linear;
+        odom_msg.twist.twist.angular.z = angular;
+
+        odom_pub_->publish(odom_msg);
+
+        // Publish TF odom → base_link
+        geometry_msgs::msg::TransformStamped odom_tf;
+        odom_tf.header.stamp = now_time;
+        odom_tf.header.frame_id = "odom";
+        odom_tf.child_frame_id = "base_link";
+        odom_tf.transform.translation.x = x_;
+        odom_tf.transform.translation.y = y_;
+        odom_tf.transform.translation.z = 0.0;
+        odom_tf.transform.rotation.x = q.x();
+        odom_tf.transform.rotation.y = q.y();
+        odom_tf.transform.rotation.z = q.z();
+        odom_tf.transform.rotation.w = q.w();
+
+        tf_broadcaster_->sendTransform(odom_tf);
+    }
+
 
     void check_watchdog()
     {
@@ -220,12 +284,13 @@ public:
 
 
     const std::map<RobotState, std::pair<double,double>> command_map = {
-        {RobotState::FORWARD,  {0.9,  0.0}},
-        {RobotState::BACKWARD, {-0.9, 0.0}},
-        {RobotState::LEFT,     {0.0,  1.5}},
-        {RobotState::RIGHT,    {0.0, -1.5}},
-        {RobotState::STOP,     {0.0,  0.0}}
+        {RobotState::FORWARD,  { 0.15,     0.0}},
+        {RobotState::BACKWARD, {-0.15,     0.0}},
+        {RobotState::LEFT,     { 0.0,  0.785398}},
+        {RobotState::RIGHT,    { 0.0, -0.785398}},
+        {RobotState::STOP,     { 0.0,     0.0}}
     };
+
 
     rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr subscription_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr manual_cmd_sub_;
@@ -239,6 +304,13 @@ public:
     std::string signals_dir_path_;
     std::map<RobotState, std::vector<IRSignal>> ir_signals;
     int pi;
+
+    double x_ = 0.0;
+    double y_ = 0.0;
+    double theta_ = 0.0;
+    rclcpp::Time last_odom_time_;
+    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };
   
 int main(int argc, char * argv[])
