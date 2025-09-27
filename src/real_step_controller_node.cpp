@@ -76,6 +76,10 @@ public:
         "/manual_cmd", 10, std::bind(&StepController::manual_cmd_callback, this, _1));
         RCLCPP_INFO(this->get_logger(), "Subscription on /manual_cmd created!");
 
+        odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
+        tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+        last_odom_time_ = this->now();
+
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&StepController::send_command, this));
