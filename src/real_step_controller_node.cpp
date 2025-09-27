@@ -86,6 +86,7 @@ public:
             std::bind(&StepController::check_watchdog, this));
 
         last_cmd_time_ = now();
+        last_odom_time_ = this->now();
         current_state = RobotState::STOP;
     }
 
@@ -316,11 +317,7 @@ public:
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::NodeOptions options;
-    options.parameter_overrides({
-        rclcpp::Parameter("use_sim_time", true)
-    });
-    auto node = std::make_shared<StepController>(options);
+    auto node = std::make_shared<StepController>();
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
