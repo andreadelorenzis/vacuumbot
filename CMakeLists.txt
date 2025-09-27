@@ -69,9 +69,11 @@ if(NOT BUILD_FOR_ROBOT)
   )
 endif()
 
-add_executable(mqtt_ros2_bridge
-    src/mqtt_ros2_bridge.cpp
-)
+if(NOT BUILD_FOR_ROBOT)
+  add_executable(mqtt_ros2_bridge
+      src/mqtt_ros2_bridge.cpp
+  )
+endif()
 
 add_executable(debug_node 
     src/debug_node.cpp
@@ -120,27 +122,29 @@ if(NOT BUILD_FOR_ROBOT)
     lifecycle_msgs
     opennav_coverage_msgs
   )
+
+  ament_target_dependencies(mqtt_ros2_bridge
+    rclcpp
+    std_msgs
+    geometry_msgs
+    nav_msgs
+  )
 endif()
 
-ament_target_dependencies(mqtt_ros2_bridge
-  rclcpp
-  std_msgs
-  geometry_msgs
-  nav_msgs
-)
 
 ament_target_dependencies(debug_node rclcpp 
     std_msgs
 )
 
-target_link_libraries(mqtt_ros2_bridge
-  paho-mqttpp3
-  paho-mqtt3a
-)
-rosidl_target_interfaces(mqtt_ros2_bridge
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 if(NOT BUILD_FOR_ROBOT)
+  target_link_libraries(mqtt_ros2_bridge
+    paho-mqttpp3
+    paho-mqtt3a
+  )
+  rosidl_target_interfaces(mqtt_ros2_bridge
+    ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
   rosidl_target_interfaces(coverage_nav2_node
     ${PROJECT_NAME} "rosidl_typesupport_cpp")
 endif()
@@ -181,7 +185,7 @@ endif()
 if(BUILD_FOR_ROBOT)
   install(TARGETS
     real_step_controller_node
-    mqtt_ros2_bridge
+    # mqtt_ros2_bridge
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION lib/${PROJECT_NAME}
