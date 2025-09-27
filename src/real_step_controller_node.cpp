@@ -49,8 +49,7 @@ using std::placeholders::_1;
 class StepController : public rclcpp::Node
 {
 public:
-    StepController(const rclcpp::NodeOptions & options)
-    : Node("step_controller", options)
+    StepController() : Node("step_controller")
     {
         this->declare_parameter<std::string>("signals_dir", "");
         signals_dir_path_ = this->get_parameter("signals_dir").as_string();
