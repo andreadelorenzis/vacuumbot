@@ -56,7 +56,7 @@ public:
         RCLCPP_INFO(this->get_logger(), "Signals dir path: %s", signals_dir_path_.c_str());
 
         ir_signals[RobotState::FORWARD]  = read_ir_from_file(signals_dir_path_ + "/ir_forward.txt");
-        ir_signals[RobotState::BACKWARD] = read_ir_from_file(signals_dir_path_ + "/ir_backward.txt");
+        ir_signals[RobotState::BACKWARD] = read_ir_from_file(signals_dir_path_ + "/ir_back.txt");
         ir_signals[RobotState::LEFT]     = read_ir_from_file(signals_dir_path_ + "/ir_left.txt");
         ir_signals[RobotState::RIGHT]    = read_ir_from_file(signals_dir_path_ + "/ir_right.txt");
 
