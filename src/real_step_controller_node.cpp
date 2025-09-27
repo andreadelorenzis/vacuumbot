@@ -78,7 +78,7 @@ public:
 
         odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-        last_odom_time_ = this->now();y
+        last_odom_time_ = this->now();
 
         publish_timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
