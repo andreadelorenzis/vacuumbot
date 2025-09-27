@@ -32,6 +32,7 @@ if(NOT BUILD_FOR_ROBOT)
   find_package(opennav_coverage_msgs REQUIRED)
 endif()
 find_package(lifecycle_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 # find_package(PkgConfig REQUIRED)
 # pkg_check_modules(PAHO_MQTT_CPP REQUIRED paho-mqttpp3)
@@ -103,6 +104,7 @@ if(NOT BUILD_FOR_ROBOT)
     nav_msgs
     nav2_core
     pluginlib
+    tf2_ros
   )
 
   ament_target_dependencies(web_bridge_node
@@ -156,6 +158,7 @@ if(BUILD_FOR_ROBOT)
     rclcpp
     geometry_msgs
     nav_msgs
+    tf2_ros
   )
 
 endif()
