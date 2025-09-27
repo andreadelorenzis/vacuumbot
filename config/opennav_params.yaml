@@ -144,8 +144,8 @@ controller_server:
       desired_linear_vel: 1.0
       lookahead_dist: 0.4
       min_lookahead_dist: 0.3
-      max_lookahead_dist: 0.9
-      lookahead_time: 1.5
+      max_lookahead_dist: 1.5
+      lookahead_time: 2.0
       rotate_to_heading_angular_vel: 3.5
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.05
@@ -223,14 +223,14 @@ planner_server:
       plugin: "nav2_navfn_planner::NavfnPlanner"
       tolerance: 0.5
       use_astar: false
-      allow_unknown: true
+      allow_unknown: false
 
 velocity_smoother:
   ros__parameters:
     use_sim_time: True
     smoothing_frequency: 20.0
     scale_velocities: False
-    feedback: "OPEN_LOOP"
+    feedback: "CLOSED_LOOP"
     max_velocity: [1.0, 0.0, 3.0]
     min_velocity: [-1.0, 0.0, -3.0]
     max_accel: [5.0, 0.0, 8.0]
