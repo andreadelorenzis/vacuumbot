@@ -140,8 +140,11 @@ target_link_libraries(mqtt_ros2_bridge
 rosidl_target_interfaces(mqtt_ros2_bridge
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-rosidl_target_interfaces(coverage_nav2_node
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+if(NOT BUILD_FOR_ROBOT)
+  rosidl_target_interfaces(coverage_nav2_node
+    ${PROJECT_NAME} "rosidl_typesupport_cpp")
+endif()
+
 
 if(BUILD_FOR_ROBOT)
 
