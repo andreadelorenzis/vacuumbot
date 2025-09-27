@@ -20,6 +20,7 @@
   <depend>builtin_interfaces</depend>
   <depend>nav2_core</depend>
   <depend>nav2_util</depend>
+  <depend>ros-kilted-nav2-util</depend>
   <depend>pluginlib</depend>
   <depend>nav2_bringup</depend>
   <depend>opennav_coverage_msgs</depend>
@@ -27,6 +28,26 @@
   <depend>opennav_coverage</depend>
   <depend>opennav_row_coverage</depend>
   <depend>opennav_coverage_navigator</depend>
+  <depend>slam_toolbox</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>ros_gz_image</depend>
+  <depend>ros_gz_image_bridge</depend>
+  <depend>ros-kilted-ros-gz-sim</depend>
+  <depend>twist_mux</depend>
+  <depend>controller_manager</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>tf2_ros</depend>
+  <depend>rviz2</depend>
+  <depend>ros-kilted-ros2-control</depend>
+  <depend>ros-kilted-ros2-controllers</depend>
+  <depend>paho-mqttpp3</depend>
+  <depend>paho-mqtt3as</depend>
+  <depend>joy</depend>
+  <depend>teleop_twist_joy</depend>
+  <depend>twist_stamper</depend>
+  <depend>ros-kilted-gz-ros2-control</depend>
+
 
   <exec_depend>rosidl_default_runtime</exec_depend>
   

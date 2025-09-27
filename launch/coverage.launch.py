@@ -7,6 +7,7 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch.actions import SetEnvironmentVariable
 
 from launch_ros.actions import Node
 from launch.actions import RegisterEventHandler, TimerAction
@@ -35,6 +36,15 @@ def generate_launch_description():
         description='World to load'
         )
     
+    # Directory per i modelli
+    gz_sim_resource_path = os.path.join(os.environ.get('AMENT_PREFIX_PATH', ''), 'src/vacuumbot/models')
+    print("gz_sim_resource_path",gz_sim_resource_path)
+
+    # Aggiungi la variabile d'ambiente per GZ_SIM_RESOURCE_PATH
+    set_gz_resource_path = SetEnvironmentVariable(
+        'GZ_SIM_RESOURCE_PATH', gz_sim_resource_path
+    )
+
     start_x_arg = DeclareLaunchArgument(
         'start_x', default_value='-1.62', description='Posizione iniziale X'
     )
@@ -240,6 +250,7 @@ def generate_launch_description():
 
     # Launch them all!
     return LaunchDescription([
+        # set_gz_resource_path,
         start_x_arg,
         start_y_arg,
         start_theta_arg,

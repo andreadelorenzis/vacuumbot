@@ -162,10 +162,10 @@ public:
 
 
     const std::map<RobotState, std::pair<double,double>> command_map = {
-        {RobotState::FORWARD,  {0.9,  0.0}},
-        {RobotState::BACKWARD, {-0.9, 0.0}},
-        {RobotState::LEFT,     {0.0,  1.5}},
-        {RobotState::RIGHT,    {0.0, -1.5}},
+        {RobotState::FORWARD,  {0.5,  0.0}},
+        {RobotState::BACKWARD, {-0.5, 0.0}},
+        {RobotState::LEFT,     {0.0,  0.8}},
+        {RobotState::RIGHT,    {0.0, -0.8}},
         {RobotState::STOP,     {0.0,  0.0}}
     };
 

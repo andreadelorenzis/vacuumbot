@@ -38,6 +38,7 @@ find_package(lifecycle_msgs REQUIRED)
 # pkg_check_modules(PAHO_MQTT_C REQUIRED paho-mqtt3as)
 
 include_directories(/usr/include)
+link_directories(/usr/local/lib)
 link_directories(/usr/lib/x86_64-linux-gnu)
 
 include_directories(
@@ -134,7 +135,7 @@ ament_target_dependencies(debug_node rclcpp
 
 target_link_libraries(mqtt_ros2_bridge
   paho-mqttpp3
-  paho-mqtt3as
+  paho-mqtt3a
 )
 rosidl_target_interfaces(mqtt_ros2_bridge
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
