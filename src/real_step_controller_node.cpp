@@ -115,8 +115,23 @@ public:
         }
 
         if (new_state != current_state) {
+            // Calculates movement of previous state
+            double delta_x = x_ - state_start_x_;
+            double delta_y = y_ - state_start_y_;
+            double delta_theta = theta_ - state_start_theta_;
+            RCLCPP_INFO(this->get_logger(),
+                "[STATE CHANGE] Stato precedente: %s → Spostamento: Δx = %.3f m, Δy = %.3f m, Δθ = %.3f rad",
+                state_to_string(current_state).c_str(),
+                delta_x, delta_y, delta_theta);
+
             current_state = new_state;
-            RCLCPP_INFO(this->get_logger(), "Current state: %s", state_to_string(current_state).c_str());
+
+            // Save start pos for new state
+            state_start_x_ = x_;
+            state_start_y_ = y_;
+            state_start_theta_ = theta_;
+            
+            RCLCPP_INFO(this->get_logger(), "New state: %s", state_to_string(current_state).c_str());
         }
     }
 
@@ -320,6 +335,11 @@ public:
     rclcpp::Time last_odom_time_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+    double state_start_x_ = 0.0;
+    double state_start_y_ = 0.0;
+    double state_start_theta_ = 0.0;
+
 };
   
 int main(int argc, char * argv[])
